@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [convertedFile, setConvertedFile] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export default function Home() {
     formData.append("requiredFormat", conversionType);
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/process-image", {
+      const response = await fetch(`${process.env.}/api/v1/process-image`, {
         method: "POST",
         body: formData,
       });
