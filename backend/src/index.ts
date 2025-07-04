@@ -6,7 +6,7 @@ import logger from './config/logger';
 import { fileRoutes } from './route';
 
 const app = express();
-const PORT = process.env['PORT'] || 8080;
+const PORT = process.env['PORT'] || 3000;
 
 // Middleware
 app.use(helmet()); // Security headers
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use('/api/v1', fileRoutes);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(Number(PORT) ,process.env['HOST'] || '0.0.0.0', () => {
   logger.info(`Server is running on port ${PORT}`);
 });
 
