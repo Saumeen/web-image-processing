@@ -31,7 +31,7 @@ export default function Home() {
     formData.append("requiredFormat", conversionType);
 
     try {
-      const response = await fetch(`${process.env.}/api/v1/process-image`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/process-image`, {
         method: "POST",
         body: formData,
       });
