@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-
+import './globals.css'
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
