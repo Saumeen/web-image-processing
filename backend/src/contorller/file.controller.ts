@@ -22,6 +22,12 @@ const processImageController = async (req: Request, res: Response) => {
         const mimeType = formatToMime[metadata.format] || 'application/octet-stream';
         const ext = formatToExt[metadata.format] || 'bin';
         res.setHeader('Content-Type', mimeType);
+        res.setHeader('x-file-metadata', JSON.stringify({
+            width: `${metadata.width} px`,
+            height: `${metadata.height} px`,
+            format: metadata.format,
+            size: `${Math.round(resizableImage.length/1024)} KB`,
+        }));
         res.setHeader('Content-Disposition', `attachment; filename="processed-image.${ext}"`);
         res.setHeader('Content-Length', resizableImage.length);
         return res.send(resizableImage);

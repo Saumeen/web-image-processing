@@ -8,8 +8,15 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [convertedFile, setConvertedFile] = useState<string | null>(null);
   const [conversionType, setConversionType] = useState<string>("png");
+  const [quality, setQuality] = useState<number>(80);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [metadata, setMetadata] = useState<{
+    width: number;
+    height: number;
+    format: string;
+    size: number;
+  } | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files ? e.target.files[0] : null);
@@ -29,6 +36,7 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("requiredFormat", conversionType);
+    formData.append("requiredQuality", quality.toString());
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/process-image`, {
@@ -41,8 +49,11 @@ export default function Home() {
       }
 
       const blob = await response.blob();
+
+      const metadata = response.headers.get('X-File-Metadata');
       const url = URL.createObjectURL(blob);
       setConvertedFile(url);
+      setMetadata(JSON.parse(metadata || '{}'));
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     } finally {
@@ -58,44 +69,61 @@ export default function Home() {
         </h1>
 
         {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
-                <strong className="font-bold">Error:</strong>
-                <span className="block sm:inline"> {error}</span>
-            </div>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+            <strong className="font-bold">Error:</strong>
+            <span className="block sm:inline"> {error}</span>
+          </div>
         )}
 
         {/* Conversion Type Tabs */}
         <div className="flex justify-center space-x-2 border-b-2 border-gray-200 dark:border-gray-700 pb-4">
           <button
             onClick={() => setConversionType("jpeg")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg ${
-              conversionType === "jpeg"
+            className={`px-4 py-2 text-sm font-medium rounded-lg ${conversionType === "jpeg"
                 ? "bg-blue-600 text-white"
                 : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-            }`}
+              }`}
           >
             JPEG
           </button>
           <button
             onClick={() => setConversionType("png")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg ${
-              conversionType === "png"
+            className={`px-4 py-2 text-sm font-medium rounded-lg ${conversionType === "png"
                 ? "bg-blue-600 text-white"
                 : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-            }`}
+              }`}
           >
             PNG
           </button>
           <button
             onClick={() => setConversionType("webp")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg ${
-              conversionType === "webp"
+            className={`px-4 py-2 text-sm font-medium rounded-lg ${conversionType === "webp"
                 ? "bg-blue-600 text-white"
                 : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-            }`}
+              }`}
           >
             WEBP
           </button>
+        </div>
+
+        {/* Quality Slider */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Quality: {quality}%
+          </label>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={quality}
+            onChange={(e) => setQuality(Number(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            disabled={isLoading}
+          />
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>Low Quality (Smaller file)</span>
+            <span>High Quality (Larger file)</span>
+          </div>
         </div>
 
         {/* File Upload Section */}
@@ -140,7 +168,7 @@ export default function Home() {
               disabled={isLoading}
               className="w-full px-6 py-3 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition duration-300 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Converting...' : `Convert to ${conversionType.toUpperCase()}`}
+              {isLoading ? 'Converting...' : `Convert to ${conversionType.toUpperCase()} (${quality}% quality)`}
             </button>
           </div>
         )}
@@ -152,13 +180,21 @@ export default function Home() {
               Converted Image
             </h2>
             <div className="flex justify-center">
-              <Image
-                src={convertedFile}
-                alt="Converted file"
-                width={300}
-                height={300}
-                className="rounded-lg shadow-md"
-              />
+              <div className="w-1/2">
+                <Image
+                  src={convertedFile}
+                  alt="Converted file"
+                  width={300}
+                  height={300}
+                  className="rounded-lg shadow-md"
+                />
+              </div>
+              <div className="w-1/2">
+                <p>Width: {metadata?.width}</p>
+                <p>Height: {metadata?.height}</p>
+                <p>Format: {metadata?.format}</p>
+                <p>Size: {metadata?.size}</p>
+              </div>
             </div>
             <a
               href={convertedFile}
