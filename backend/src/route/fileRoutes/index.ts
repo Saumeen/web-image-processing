@@ -4,7 +4,7 @@ import upload from "../../config/multer";
 
 const router = Router();
 
-router.get('/health', (req, res) => {
+router.get('/health', (_, res) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
