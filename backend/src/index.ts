@@ -19,8 +19,8 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use('/api/v1', fileRoutes);
 
 // Start server
-app.listen(Number(PORT) ,process.env['HOST'] || '0.0.0.0', () => {
-  logger.info(`Server is running${process.env['HOST'] ? ` on ${process.env['HOST']}` : '0.0.0.0'} on port ${PORT}`);
+app.listen(PORT, () => {
+  logger.info(`Server is running on port ${PORT}`);
 });
 
 export default app; 
