@@ -44,7 +44,7 @@ export default function PDFConverter() {
     formData.append("data", JSON.stringify(requestData));
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/compress-pdf`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/process-pdf`, {
         method: "POST",
         body: formData,
       });
