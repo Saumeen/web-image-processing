@@ -11,7 +11,7 @@ const PORT = process.env['PORT'] || 8080;
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-  exposedHeaders: ['X-File-Metadata'],
+  exposedHeaders: ['X-File-Metadata', 'X-PDF-Metadata'],
 })); // Enable CORS
 app.use(morgan('combined')); // Logging
 app.use(express.json()); // Parse JSON bodies

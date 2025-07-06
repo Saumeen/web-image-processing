@@ -4,7 +4,7 @@ const storage = multer.memoryStorage();
 
 const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     // Check if the file is an image
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('application/pdf')) {
         cb(null, true);
     } else {
         cb(new Error('Only image files are allowed!'));

@@ -1,210 +1,135 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
 import './globals.css'
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [convertedFile, setConvertedFile] = useState<string | null>(null);
-  const [conversionType, setConversionType] = useState<string>("png");
-  const [quality, setQuality] = useState<number>(80);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState<{
-    width: number;
-    height: number;
-    format: string;
-    size: number;
-  } | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files ? e.target.files[0] : null);
-    setConvertedFile(null);
-    setError(null);
-  };
-
-  const handleUpload = async () => {
-    if (!file) {
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    setConvertedFile(null);
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("requiredFormat", conversionType);
-    formData.append("requiredQuality", quality.toString());
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/process-image`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to convert image.");
-      }
-
-      const blob = await response.blob();
-
-      const metadata = response.headers.get('X-File-Metadata');
-      const url = URL.createObjectURL(blob);
-      setConvertedFile(url);
-      setMetadata(JSON.parse(metadata || '{}'));
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const tools = [
+    {
+      name: "Image Converter",
+      description: "Convert images between different formats (PNG, JPEG, WEBP) with customizable quality and dimensions.",
+      href: "/image-converter",
+      icon: (
+        <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      features: ["Format conversion", "Quality adjustment", "Resize images", "Maintain aspect ratio"],
+    },
+    {
+      name: "PDF Converter",
+      description: "Convert PDFs to images, combine images into PDFs, and convert Word documents to PDF format.",
+      href: "/pdf-converter",
+      icon: (
+        <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+      features: ["PDF to images", "Images to PDF", "Word to PDF", "Batch processing"],
+    },
+  ];
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-white">
-          Image Converter
-        </h1>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
-            <strong className="font-bold">Error:</strong>
-            <span className="block sm:inline"> {error}</span>
-          </div>
-        )}
-
-        {/* Conversion Type Tabs */}
-        <div className="flex justify-center space-x-2 border-b-2 border-gray-200 dark:border-gray-700 pb-4">
-          <button
-            onClick={() => setConversionType("jpeg")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg ${conversionType === "jpeg"
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-          >
-            JPEG
-          </button>
-          <button
-            onClick={() => setConversionType("png")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg ${conversionType === "png"
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-          >
-            PNG
-          </button>
-          <button
-            onClick={() => setConversionType("webp")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg ${conversionType === "webp"
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-          >
-            WEBP
-          </button>
+      <div className="w-full max-w-4xl">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 dark:text-white mb-4">
+            Web Processing Tools
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Powerful online tools for converting and processing images and PDFs. 
+            Fast, secure, and easy to use.
+          </p>
         </div>
 
-        {/* Quality Slider */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Quality: {quality}%
-          </label>
-          <input
-            type="range"
-            min="1"
-            max="100"
-            value={quality}
-            onChange={(e) => setQuality(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-            disabled={isLoading}
-          />
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>Low Quality (Smaller file)</span>
-            <span>High Quality (Larger file)</span>
-          </div>
-        </div>
-
-        {/* File Upload Section */}
-        <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-          <input
-            type="file"
-            id="file-upload"
-            className="hidden"
-            onChange={handleFileChange}
-            accept="image/*"
-            disabled={isLoading}
-          />
-          <label
-            htmlFor="file-upload"
-            className={`cursor-pointer flex flex-col items-center space-y-2 text-gray-600 dark:text-gray-400 ${isLoading ? 'opacity-50' : ''}`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        {/* Tools Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {tools.map((tool) => (
+            <div
+              key={tool.name}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-            <span className="font-medium">
-              {file ? file.name : "Click to select a file or drag and drop"}
-            </span>
-            <span className="text-xs">PNG, JPG, WEBP, GIF, etc.</span>
-          </label>
-        </div>
-
-        {file && (
-          <div className="text-center">
-            <button
-              onClick={handleUpload}
-              disabled={isLoading}
-              className="w-full px-6 py-3 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition duration-300 disabled:bg-blue-400 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Converting...' : `Convert to ${conversionType.toUpperCase()} (${quality}% quality)`}
-            </button>
-          </div>
-        )}
-
-        {/* Result Section */}
-        {convertedFile && (
-          <div className="text-center p-6 border-t-2 border-gray-200 dark:border-gray-700 mt-6">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-              Converted Image
-            </h2>
-            <div className="flex justify-center">
-              <div className="w-1/2">
-                <Image
-                  src={convertedFile}
-                  alt="Converted file"
-                  width={300}
-                  height={300}
-                  className="rounded-lg shadow-md"
-                />
+              <div className="flex items-center space-x-4 mb-6">
+                {tool.icon}
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                    {tool.name}
+                  </h2>
+                </div>
               </div>
-              <div className="w-1/2">
-                <p>Width: {metadata?.width}</p>
-                <p>Height: {metadata?.height}</p>
-                <p>Format: {metadata?.format}</p>
-                <p>Size: {metadata?.size}</p>
+              
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                {tool.description}
+              </p>
+
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  Features:
+                </h3>
+                <ul className="space-y-2">
+                  {tool.features.map((feature) => (
+                    <li key={feature} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              <Link
+                href={tool.href}
+                className="inline-block w-full px-6 py-3 text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition duration-300"
+              >
+                Get Started
+              </Link>
             </div>
-            <a
-              href={convertedFile}
-              download={`converted-image.${conversionType}`}
-              className="inline-block w-full px-6 py-3 mt-6 text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 transition duration-300"
-            >
-              Download
-            </a>
+          ))}
+        </div>
+
+        {/* Features Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
+            Why Choose Our Tools?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Fast Processing</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Optimized algorithms for quick file processing
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Secure</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Your files are processed securely and deleted after conversion
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">No Installation</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Works directly in your browser, no software to install
+              </p>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </main>
   );

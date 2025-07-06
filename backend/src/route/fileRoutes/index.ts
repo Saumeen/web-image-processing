@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { processImageController } from "../../contorller/file.controller";
+import { processImageController, processPDFController } from "../../contorller/file.controller";
 import upload from "../../config/multer";
 
 const router = Router();
@@ -9,5 +9,8 @@ router.get('/health', (_, res) => {
 });
 
 router.post('/process-image', upload.single('file'), processImageController);
+
+router.post('/process-pdf', upload.single('file'), processPDFController);
+
 
 export default router;
