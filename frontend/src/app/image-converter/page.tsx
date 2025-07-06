@@ -56,6 +56,7 @@ export default function ImageConverter() {
     setIsLoading(true);
     setError(null);
     setConvertedFile(null);
+    setMetadata(null);
 
     const formData = new FormData();
     formData.append("file", file);
